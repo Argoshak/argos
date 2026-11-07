@@ -11,5 +11,10 @@ export function Explorer({ items, all }) {
   const list = items.filter((i) => c === 'all' || i.tag === c), cur = list.find((i) => i.t === s) || list[0]; if (!cur) return null;
   return <div><div className="pills">{['all', ...cats].map((k) => <button key={k} aria-pressed={k === c} onClick={() => { setC(k); setS(null); }}>{k === 'all' ? all : k}</button>)}</div>
     <ul className="chips big">{list.map((i) => <li key={i.t}><button aria-pressed={cur.t === i.t} onClick={() => setS(i.t)}>{i.t}</button></li>)}</ul>
-    <div className="panel" key={cur.t} aria-live="polite"><h3>{cur.t} {cur.tag && <span className="badge">{cur.tag}</span>}</h3><p>{cur.x}</p></div></div>;
+    <div className="panel" key={cur.t} aria-live="polite"><h3>{cur.t} {cur.tag && <span className="badge">{cur.tag}</span>}</h3>{cur.x && <p>{cur.x}</p>}</div></div>;
+}
+export function Layers({ items }) {
+  const [a, setA] = useState(0), it = items[a]; if (!it) return null;
+  return <div className="lay"><div className="stack">{items.map((x, k) => <button key={k} aria-pressed={k === a} style={{ '--k': k }} onClick={() => setA(k)}><b>{x.t}</b></button>)}</div>
+    <div className="panel" key={a} aria-live="polite"><h3>{it.t}</h3><p>{it.x}</p><ul className="chips">{it.meta.split(' · ').map((t) => <li key={t}>{t}</li>)}</ul></div></div>;
 }

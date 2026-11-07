@@ -2,7 +2,7 @@ import { getSite, getProjects, getLang, tx } from '../lib/content';
 import { session } from '../lib/auth';
 import LangSwitch from './LangSwitch';
 import Fx from './Fx';
-import { Steps, Explorer } from './Mods';
+import { Steps, Explorer, Layers } from './Mods';
 export const dynamic = 'force-dynamic';
 const safe = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol) ? u : null; } catch { return null; } };
 export async function generateMetadata() {
@@ -42,7 +42,11 @@ export default async function Home({ searchParams }) {
     contact: <><p className="rv">{c('contact_text')}</p><div className="grid">{social.map((x, i) => <a key={x.id} className="card cc rv" style={rv(i)} href={safe(x.url)} rel="noopener noreferrer" target={x.url.startsWith('mailto:') ? undefined : '_blank'}><b>{x.label}</b><span>{host(x.url)}</span></a>)}</div></>,
   };
   const mods = s.modules || [];
-  const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: i.tag || '', meta: i.meta || '' }));
+  const lv = (v) => (v && typeof v === 'object' ? tx(v, lang) : v || '');
+  const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: lv(i.tag), meta: lv(i.meta) }));
+    if (m.type === 'layers') return <Layers items={it} />;
+    if (m.type === 'bars') { const src = m.auto === 'ecosystem' ? Object.entries((mods.find((x) => x.id === 'ecosystem')?.items || []).reduce((a, i) => { const g = lv(i.tag); a[g] = (a[g] || 0) + 1; return a; }, {})).map(([t, v]) => ({ t, v })) : it.map((i) => ({ t: i.t, v: parseFloat(i.meta) || 0 })); const mx = Math.max(1, ...src.map((b) => b.v));
+      return <div className="bars">{src.map((b) => <div className="bar rv" key={b.t}><span>{b.t}</span><div><i style={{ '--w': (b.v / mx) * 100 + '%' }} /></div><b>{b.v}</b></div>)}</div>; }
     if (m.type === 'steps') return <Steps items={it} />;
     if (m.type === 'explorer') return <Explorer items={it} all={ALL[lang]} />;
     if (m.type === 'list') return <ol className="tl">{it.map((i, k) => <li className="rv" key={k}><b>{i.t} {i.meta && <span className="badge">{i.meta}</span>}</b><span>{i.x}</span></li>)}</ol>;

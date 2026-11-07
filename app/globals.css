@@ -102,3 +102,15 @@ body{font-family:"Readex Pro",Cairo,"Segoe UI",Tahoma,system-ui,sans-serif}
 .ah{background:var(--navy);color:#fff;padding:14px 20px;border-bottom:4px solid var(--gold);display:flex;gap:14px;align-items:center;border-radius:20px 20px 0 0}.ah h1{flex:1;margin:0;color:#fff;font-size:22px}.ah a{color:var(--gold)}
 .stat-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:14px 0}.sc{background:var(--navy);color:#cdd8ff;border-radius:16px;padding:16px;border-bottom:4px solid var(--gold);font-size:13px}.sc b{display:block;color:#fff;font-size:30px}
 .card2{background:#f3f6ff;border:1px solid #dbe2f7;border-radius:16px;padding:14px 18px;margin:12px 0}.card2 h3{margin:0 0 6px;color:var(--navy)}.adm .tabs button{border-radius:99px;text-transform:capitalize}.adm button:hover{outline:2px solid var(--gold)}
+/* v4 fixes */
+.hd .lead::first-letter{all:unset}
+.chips.big li{color:var(--ink)}.chips.big button{color:var(--ink)}.chips.big button[aria-pressed=true]{color:var(--navy)}
+[data-theme=dark] .chips li{background:#ffffff1f;color:#fff}[data-theme=dark] .chips li:hover{background:var(--gold);color:var(--navy)}
+.panel,.panel p,.panel h3{color:var(--ink)}.dk .panel,.dk .panel p,.dk .panel h3{color:#fff}.dk .chips.big li>span,.dk .chips.big button{color:#fff}
+.bars{display:grid;gap:14px;max-width:760px}.bar{display:grid;grid-template-columns:170px 1fr 36px;gap:14px;align-items:center;font-weight:600}
+.bar div{background:var(--line);height:16px;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--royal),var(--gold));border-radius:99px;transition:width 1.1s cubic-bezier(.2,.8,.2,1) .2s}
+.bar.in i{width:var(--w)}.bar b{color:var(--royal);text-align:end}[data-theme=dark] .bar b{color:var(--gold)}
+.lay{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}.stack{display:grid;gap:8px;justify-items:center}
+.stack button{width:calc(62% + var(--k)*9.5%);background:var(--navy);color:#fff;border:2px solid transparent;border-radius:14px;padding:14px;font-weight:700;transition:all .25s}
+.stack button:hover{border-color:var(--gold);transform:translateY(-2px)}.stack button[aria-pressed=true]{background:var(--gold);color:var(--navy);box-shadow:0 8px 22px #ffc80044}
+@media(max-width:860px){.lay{grid-template-columns:1fr}.bar{grid-template-columns:110px 1fr 28px}}

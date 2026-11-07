@@ -12,7 +12,7 @@ function check(key, v) {
   if (key === 'socials') { if (!Array.isArray(v)) return 'Socials must be a list'; for (const x of v) if (x.enabled && !url(x.url)) return `Invalid URL for ${x.label}`; }
   if (key === 'theme') { for (const k of ['navy', 'royal', 'gold', 'bg']) if (!hex.test(v?.[k] || '')) return `Invalid color: ${k}`; if (!/^\d{1,2}px$/.test(v.radius || '')) return 'Invalid radius (e.g. 6px)'; }
   if (key === 'sections' && (!Array.isArray(v) || v.some((x) => !ID.includes(x.id)))) return 'Unknown section id';
-  if (key === 'modules' && (!Array.isArray(v) || v.some((m) => !/^[a-z0-9-]{2,40}$/.test(m.id || '') || !['cards', 'editorial', 'steps', 'explorer', 'list'].includes(m.type)))) return 'Invalid module';
+  if (key === 'modules' && (!Array.isArray(v) || v.some((m) => !/^[a-z0-9-]{2,40}$/.test(m.id || '') || !['cards', 'editorial', 'steps', 'explorer', 'list', 'layers', 'bars'].includes(m.type)))) return 'Invalid module';
   if (key === 'identity' && !img(v?.photo)) return 'Invalid photo URL';
   if (typeof v !== 'object' || v === null) return 'Invalid value';
   return null;
@@ -69,6 +69,7 @@ export async function POST(req) {
         if (r.error) return J({ error: r.error.code === '23505' ? 'Slug already used' : 'Save failed' }, 400);
         await log(who, p.id ? 'edit project' : 'create project', p.slug); return J({ ok: true });
       }
+      case 'publishAll': await snapshot(who); await sb.from('projects').update({ published: true }).neq('id', '00000000-0000-0000-0000-000000000000'); await log(who, 'publish all'); return J({ ok: true });
       case 'deleteProject': await snapshot(who); await sb.from('projects').delete().eq('id', b.id); await log(who, 'delete project', b.id); return J({ ok: true });
       case 'duplicateProject': {
         const { data: p } = await sb.from('projects').select('*').eq('id', b.id).single(); if (!p) return J({ error: 'Not found' }, 404);
