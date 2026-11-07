@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 export default function Fx() {
   useEffect(() => {
     const d = document, h = d.documentElement;
-    try { const t = localStorage.getItem('th'); if (t) h.dataset.theme = t; } catch {}
+    try { h.dataset.theme = localStorage.getItem('th') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); } catch {}
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
     d.querySelectorAll('.rv').forEach((el) => io.observe(el));
     const secs = [...d.querySelectorAll('section[id]')], links = [...d.querySelectorAll('nav a')], pg = d.getElementById('pg'), up = d.getElementById('up');

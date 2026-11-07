@@ -2,6 +2,7 @@ import { getSite, getProjects, getLang, tx } from '../lib/content';
 import { session } from '../lib/auth';
 import LangSwitch from './LangSwitch';
 import Fx from './Fx';
+import { Steps, Explorer } from './Mods';
 export const dynamic = 'force-dynamic';
 const safe = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol) ? u : null; } catch { return null; } };
 export async function generateMetadata() {
@@ -40,6 +41,13 @@ export default async function Home({ searchParams }) {
     philosophy: <blockquote className="quote rv"><p className="pre">{c('philosophy')}</p></blockquote>,
     contact: <><p className="rv">{c('contact_text')}</p><div className="grid">{social.map((x, i) => <a key={x.id} className="card cc rv" style={rv(i)} href={safe(x.url)} rel="noopener noreferrer" target={x.url.startsWith('mailto:') ? undefined : '_blank'}><b>{x.label}</b><span>{host(x.url)}</span></a>)}</div></>,
   };
+  const mods = s.modules || [];
+  const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: i.tag || '', meta: i.meta || '' }));
+    if (m.type === 'steps') return <Steps items={it} />;
+    if (m.type === 'explorer') return <Explorer items={it} all={ALL[lang]} />;
+    if (m.type === 'list') return <ol className="tl">{it.map((i, k) => <li className="rv" key={k}><b>{i.t} {i.meta && <span className="badge">{i.meta}</span>}</b><span>{i.x}</span></li>)}</ol>;
+    if (m.type === 'editorial') return <div className="ed">{it.filter((i) => i.x).map((i, k) => <div className="rv" key={k}><h3>{i.t}</h3><p className="pre">{i.x}</p></div>)}<ul className="chips big">{it.filter((i) => !i.x).map((i, k) => <li className="rv" key={k}><span>{i.t}</span></li>)}</ul></div>;
+    return <div className="grid">{it.map((i, k) => <div className="card rv" style={rv(k)} key={k}><span className="num">{String(k + 1).padStart(2, '0')}</span><h3>{i.t}</h3><p className="pre">{i.x}</p>{i.meta && <span className="badge">{i.meta}</span>}</div>)}</div>; };
   const secs = s.sections.filter((x) => x.enabled), dark = ['skills', 'systems'];
   return (
     <div className="site" style={{ '--navy': th.navy, '--royal': th.royal, '--gold': th.gold, '--bg0': th.bg, '--r': th.radius }}>
@@ -53,10 +61,13 @@ export default async function Home({ searchParams }) {
           <div><p className="loc">{c('location')}</p><h1>{c('name')}</h1><p className="role">{c('role')}</p>
             <p className="tag">{c('tagline')} <span className="cycle" data-words={words.join('|')}>{words[0]}</span></p>
             <p><a className="btn p" href="#projects">{c('cta_projects')}</a><a className="btn s" href="#contact">{c('cta_contact')}</a></p><p className="links soc">{links('')}</p>
-            <div className="stats">{P.length > 0 && <div><b>{P.length}</b>{c('nav_projects')}</div>}<div><b>{nSk}</b>{c('nav_skills')}</div><div><b>3</b>AR · FR · EN</div></div></div>
+            </div>
           <div className="av"><img src={s.identity.photo} alt={c('photo_alt')} width="340" height="340" /></div>
         </div></div>
-        {secs.map((x, i) => <section id={x.id} key={x.id} className={dark.includes(x.id) ? 'dk' : i % 2 ? 'alt' : ''}><div className="wrap"><h2 className="rv"><i>{String(i + 1).padStart(2, '0')}</i>{c('nav_' + x.id)}</h2>{body[x.id]}</div></section>)}
+        <div className="wrap"><div className="statbar">{P.length > 0 && <div><b>{P.length}</b>{c('nav_projects')}</div>}<div><b>{nSk}</b>{c('nav_skills')}</div><div><b>3</b>AR · FR · EN</div></div></div>
+        <div className="mq" aria-hidden="true"><div>{[...words, ...words].map((w, k) => <span key={k}>{w}</span>)}</div></div>
+        {(() => { let n = 0; const sec = (id, title, intro, inner, cls) => { n++; return <section id={id} key={id} className={cls}><div className="wrap"><div className="hd rv"><h2><i>{String(n).padStart(2, '0')}</i>{title}</h2>{intro && <p className="lead">{intro}</p>}</div>{inner}</div></section>; };
+          return secs.flatMap((x) => [sec(x.id, c('nav_' + x.id), '', body[x.id], dark.includes(x.id) ? 'dk' : n % 2 ? 'alt' : ''), ...mods.filter((m) => m.enabled && (m.at || 'projects') === x.id).map((m) => sec(m.id, tx(m.title, lang), tx(m.intro, lang), modBody(m), n % 2 ? 'alt' : ''))]); })()}
       </main>
       <footer><div className="wrap"><b className="logo">ZA</b><p className="links soc">{links('')}</p>© {new Date().getFullYear()} {c('footer')}</div></footer>
       <a id="up" href="#top" aria-label="Top">↑</a>

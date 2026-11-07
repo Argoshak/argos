@@ -1,0 +1,1 @@
+export default function NotFound() { return <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#0B1953', color: '#fff', textAlign: 'center' }}><div><h1 style={{ fontSize: 72, margin: 0, color: '#FFC800' }}>404</h1><p>Page not found.</p><a href="/" style={{ color: '#FFC800' }}>← Home</a></div></main>; }

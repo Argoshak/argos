@@ -33,8 +33,8 @@ function Panel({ out }) {
   useEffect(() => { load(); }, [load]);
   const run = async (b, ok = 'Saved.') => { const r = await api(b); setMsg(r.error ? 'Error: ' + r.error : ok); if (!r.error) await load(); return r; };
   if (!d) return <div className="adm"><p>{msg || 'Loading…'}</p></div>;
-  const tabs = { overview: <Overview d={d} />, projects: <Projects d={d} run={run} />, content: <Content key={d.content.copy && JSON.stringify(d.content.copy).length} d={d} run={run} />, data: <DataEd d={d} run={run} />, images: <Images d={d} load={load} setMsg={setMsg} run={run} />, history: <History d={d} run={run} /> };
-  return <div className="adm"><div className="row"><h1 style={{ flex: 1 }}>Dashboard</h1><a href="/?preview=1" target="_blank">Preview</a><button onClick={out}>Sign out</button></div>
+  const tabs = { overview: <Overview2 d={d} />, projects: <Projects d={d} run={run} />, modules: <Modules d={d} run={run} />, search: <Search d={d} go={setTab} />, content: <Content key={d.content.copy && JSON.stringify(d.content.copy).length} d={d} run={run} />, data: <DataEd d={d} run={run} />, images: <Images d={d} load={load} setMsg={setMsg} run={run} />, history: <History d={d} run={run} /> };
+  return <div className="adm"><div className="ah"><h1>Dashboard</h1><a href="/?preview=1" target="_blank">Preview</a><button onClick={out}>Sign out</button></div>
     <div className="tabs" role="tablist">{Object.keys(tabs).map((k) => <button key={k} aria-pressed={k === tab} onClick={() => { setTab(k); setMsg(''); }}>{k}</button>)}</div>
     {msg && <div className="msg" role="status">{msg}</div>}{tabs[tab]}</div>;
 }
@@ -102,4 +102,49 @@ function History({ d, run }) {
     {d.versions.length === 0 && <p>No backups yet.</p>}
     {d.versions.map((v) => <p key={v.id}>{fmt(v.at)} — {v.actor} <button onClick={() => confirm('Restore this version? Current content is backed up first.') && run({ action: 'restore', id: v.id }, 'Restored.')}>Restore</button></p>)}
     <h3>Activity</h3>{d.activity.map((a) => <p key={a.id}>{fmt(a.at)} — {a.actor}: {a.action} {a.detail}</p>)}</div>;
+}
+
+function Overview2({ d }) {
+  const P = d.projects, pub = P.filter((p) => p.published).length, c = d.content.copy, M = d.content.modules || [];
+  const miss = (l) => Object.keys(c.en).filter((k) => k !== 'education' && !c[l]?.[k]).length;
+  const S = [[P.length, 'Projects'], [pub, 'Published'], [P.length - pub, 'Drafts'], [M.filter((m) => m.enabled).length + '/' + M.length, 'Modules on'], [d.content.sections.filter((s) => s.enabled).length, 'Sections']];
+  return <div><div className="stat-g">{S.map(([n, t]) => <div className="sc" key={t}><b>{n}</b>{t}</div>)}</div>
+    <div className="card2"><h3>Translations</h3>{L.map((l) => <p key={l}><b>{l.toUpperCase()}</b>: {miss(l)} missing</p>)}</div>
+    <div className="card2"><h3>Recent activity</h3>{d.activity.slice(0, 6).map((a) => <p key={a.id}>{fmt(a.at)} — {a.actor}: {a.action} {a.detail}</p>)}</div></div>;
+}
+function Search({ d, go }) {
+  const [q, setQ] = useState(''), n = q.trim().toLowerCase();
+  const all = [...d.projects.map((p) => ['projects', p.data.title?.en || p.slug, JSON.stringify(p.data)]), ...(d.content.modules || []).map((m) => ['modules', m.title?.en || m.id, JSON.stringify(m)]),
+    ...Object.keys(d.content.copy.en).map((k) => ['content', k, Object.values(d.content.copy).map((x) => x[k]).join(' ')])];
+  const hits = n ? all.filter((h) => (h[1] + h[2]).toLowerCase().includes(n)) : [];
+  return <div><input placeholder="Search projects, modules and texts…" value={q} onChange={(e) => setQ(e.target.value)} />{n && !hits.length && <p>No results.</p>}
+    {hits.slice(0, 40).map((h, i) => <p key={i}><button onClick={() => go(h[0])}>{h[0]}</button> {h[1]}</p>)}</div>;
+}
+const TYPES = ['cards', 'editorial', 'steps', 'explorer', 'list'], AT = ['about', 'skills', 'projects', 'journey', 'systems', 'philosophy', 'contact'];
+function Modules({ d, run }) {
+  const [M, setM] = useState(d.content.modules || []), [e, setE] = useState(null), [l, setL] = useState('en');
+  const mv = (a, i, k) => { const b = [...a]; if (i + k < 0 || i + k >= b.length) return b; [b[i], b[i + k]] = [b[i + k], b[i]]; return b; };
+  const save = () => run({ action: 'save', key: 'modules', value: M }, 'Modules saved.');
+  const upd = (i, p) => setM(M.map((m, k) => (k === i ? { ...m, ...p } : m)));
+  const tl = (o, v) => ({ ...(o || {}), [l]: v });
+  const Lang = () => <p>{L.map((x) => <button key={x} aria-pressed={x === l} onClick={() => setL(x)}>{x.toUpperCase()}</button>)}</p>;
+  if (e !== null) { const m = M[e], it = m.items || [], setIt = (items) => upd(e, { items }), upI = (k, p) => setIt(it.map((x, j) => (j === k ? { ...x, ...p } : x)));
+    return <div><button onClick={() => setE(null)}>← Modules</button>
+      <div className="row"><label>Type<select value={m.type} onChange={(x) => upd(e, { type: x.target.value })}>{TYPES.map((t) => <option key={t}>{t}</option>)}</select></label>
+        <label>Place after<select value={m.at || 'projects'} onChange={(x) => upd(e, { at: x.target.value })}>{AT.map((t) => <option key={t}>{t}</option>)}</select></label></div>
+      <Lang /><label>Title ({l}){!m.title?.[l] && <em> — missing</em>}<input dir={l === 'ar' ? 'rtl' : 'ltr'} value={m.title?.[l] || ''} onChange={(x) => upd(e, { title: tl(m.title, x.target.value) })} /></label>
+      <label>Intro ({l}){!m.intro?.[l] && <em> — missing</em>}<textarea rows={5} dir={l === 'ar' ? 'rtl' : 'ltr'} value={m.intro?.[l] || ''} onChange={(x) => upd(e, { intro: tl(m.intro, x.target.value) })} /></label>
+      <h3>Items ({it.length})</h3>
+      {it.map((x, k) => <div className="card2" key={k}><div className="row"><button onClick={() => setIt(mv(it, k, -1))}>↑</button><button onClick={() => setIt(mv(it, k, 1))}>↓</button>
+        <button className="bad" onClick={() => confirm('Remove this item?') && setIt(it.filter((_, j) => j !== k))}>Remove</button></div>
+        <label>Title ({l}){!x.title?.[l] && <em> — missing</em>}<input dir={l === 'ar' ? 'rtl' : 'ltr'} value={x.title?.[l] || ''} onChange={(y) => upI(k, { title: tl(x.title, y.target.value) })} /></label>
+        <label>Text ({l}){!x.text?.[l] && <em> — missing</em>}<textarea rows={3} dir={l === 'ar' ? 'rtl' : 'ltr'} value={x.text?.[l] || ''} onChange={(y) => upI(k, { text: tl(x.text, y.target.value) })} /></label>
+        <div className="row"><label>Category / tag<input value={x.tag || ''} onChange={(y) => upI(k, { tag: y.target.value })} /></label><label>Badge / date<input value={x.meta || ''} onChange={(y) => upI(k, { meta: y.target.value })} /></label></div></div>)}
+      <button onClick={() => setIt([...it, { title: {}, text: {}, tag: '', meta: '' }])}>+ Add item</button> <button className="go" onClick={save}>Save modules</button></div>; }
+  return <div><p>Each module is a section on the public site. Turn it on, choose where it appears, and edit its content in every language.</p>
+    <table><tbody>{M.map((m, i) => <tr key={m.id}><td><b>{m.title?.en || m.id}</b><br /><small>{m.type} · after {m.at || 'projects'} · {(m.items || []).length} items</small></td>
+      <td className="row"><label><input type="checkbox" checked={!!m.enabled} onChange={(x) => upd(i, { enabled: x.target.checked })} /> On</label>
+        <button onClick={() => setM(mv(M, i, -1))}>↑</button><button onClick={() => setM(mv(M, i, 1))}>↓</button><button onClick={() => setE(i)}>Edit</button>
+        <button className="bad" onClick={() => confirm('Delete this module?') && setM(M.filter((_, k) => k !== i))}>Delete</button></td></tr>)}</tbody></table>
+    <button onClick={() => { setM([...M, { id: 'module-' + Date.now().toString(36), type: 'cards', enabled: false, at: 'projects', title: { en: 'New module' }, intro: {}, items: [] }]); }}>+ New module</button> <button className="go" onClick={save}>Save modules</button></div>;
 }

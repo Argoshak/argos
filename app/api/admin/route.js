@@ -4,7 +4,7 @@ import { db } from '../../../lib/supabase';
 import { getSite, getProjects, snapshot, log, ensureSeed, ID } from '../../../lib/content';
 export const dynamic = 'force-dynamic';
 const J = (o, status = 200) => NextResponse.json(o, { status });
-const KEYS = ['copy', 'identity', 'skills', 'socials', 'sections', 'theme', 'seo', 'timeline'];
+const KEYS = ['copy', 'modules', 'identity', 'skills', 'socials', 'sections', 'theme', 'seo', 'timeline'];
 const url = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol); } catch { return false; } };
 const img = (u) => !u || u.startsWith('/') && !u.startsWith('//') || url(u) && u.startsWith('https:');
 const hex = /^#[0-9a-fA-F]{6}$/;
@@ -12,6 +12,7 @@ function check(key, v) {
   if (key === 'socials') { if (!Array.isArray(v)) return 'Socials must be a list'; for (const x of v) if (x.enabled && !url(x.url)) return `Invalid URL for ${x.label}`; }
   if (key === 'theme') { for (const k of ['navy', 'royal', 'gold', 'bg']) if (!hex.test(v?.[k] || '')) return `Invalid color: ${k}`; if (!/^\d{1,2}px$/.test(v.radius || '')) return 'Invalid radius (e.g. 6px)'; }
   if (key === 'sections' && (!Array.isArray(v) || v.some((x) => !ID.includes(x.id)))) return 'Unknown section id';
+  if (key === 'modules' && (!Array.isArray(v) || v.some((m) => !/^[a-z0-9-]{2,40}$/.test(m.id || '') || !['cards', 'editorial', 'steps', 'explorer', 'list'].includes(m.type)))) return 'Invalid module';
   if (key === 'identity' && !img(v?.photo)) return 'Invalid photo URL';
   if (typeof v !== 'object' || v === null) return 'Invalid value';
   return null;
