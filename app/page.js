@@ -33,7 +33,7 @@ export default async function Home({ searchParams }) {
       <div className="grid">{P.map((p, i) => { const d = p.data, L = safe(d.live), R = safe(d.repo), ti = tx(d.title, lang); return (
         <article className="card pj rv" style={rv(i)} data-s={p.status} key={p.id}>
           {d.image ? <img src={d.image} alt={ti} loading="lazy" /> : <div className="ph" aria-hidden="true"><b>{ini(ti)}</b></div>}
-          <h3>{ti} <span className="badge">{c('st_' + p.status)}</span></h3><p>{tx(d.summary, lang)}</p>
+          <h3>{ti} <span className="badge">{c('st_' + p.status) || p.status}</span></h3>{d.period && <small className="per">{d.period}</small>}<p>{tx(d.summary, lang)}</p>
           <ul className="chips">{(d.tech || []).map((x) => <li key={x}>{x}</li>)}</ul>
           {tx(d.case, lang) && <details><summary>{c('case')}</summary><p className="pre">{tx(d.case, lang)}</p></details>}
           <p className="links">{L && <a className="btn p sm" href={L} target="_blank" rel="noopener noreferrer">{c('view_live')} ↗</a>}{R && <a className="btn o sm" href={R} target="_blank" rel="noopener noreferrer">{c('view_code')}</a>}</p></article>); })}</div></> : <p>{c('no_projects')}</p>,

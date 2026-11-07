@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { session, sameOrigin } from '../../../lib/auth';
 import { db } from '../../../lib/supabase';
+import { PROJECTS } from '../../../lib/defaults';
 import { getSite, getProjects, snapshot, log, ensureSeed, ID } from '../../../lib/content';
 export const dynamic = 'force-dynamic';
 const J = (o, status = 200) => NextResponse.json(o, { status });
@@ -20,7 +21,7 @@ function check(key, v) {
 }
 function checkProject(p) {
   if (!/^[a-z0-9-]{2,60}$/.test(p.slug || '')) return 'Slug: 2-60 chars, lowercase letters, digits, hyphens';
-  if (!['completed', 'ongoing', 'concept'].includes(p.status)) return 'Invalid status';
+  if (!['completed', 'ongoing', 'concept', 'exploring'].includes(p.status)) return 'Invalid status';
   const d = p.data || {};
   for (const k of ['repo', 'live']) if (d[k] && !url(d[k])) return `Invalid ${k} URL`;
   if (!img(d.image)) return 'Invalid image URL';
@@ -73,6 +74,7 @@ async function handle(req) {
       case 'readMsg': if (!Number.isInteger(b.id)) return J({ error: 'Bad id' }, 400); await sb.from('messages').update({ read: !!b.read }).eq('id', b.id); return J({ ok: true });
       case 'deleteMsg': if (!Number.isInteger(b.id)) return J({ error: 'Bad id' }, 400); await sb.from('messages').delete().eq('id', b.id); return J({ ok: true });
       case 'reset': if (!KEYS.includes(b.key)) return J({ error: 'Unknown key' }, 400); await snapshot(who); await sb.from('site_content').delete().eq('key', b.key); return J({ ok: true });
+      case 'reseedProjects': await snapshot(who); await sb.from('projects').delete().neq('id', '00000000-0000-0000-0000-000000000000'); await sb.from('projects').insert(PROJECTS); await log(who, 'reseed projects'); return J({ ok: true });
       case 'deleteProject': await snapshot(who); await sb.from('projects').delete().eq('id', b.id); await log(who, 'delete project', b.id); return J({ ok: true });
       case 'duplicateProject': {
         const { data: p } = await sb.from('projects').select('*').eq('id', b.id).single(); if (!p) return J({ error: 'Not found' }, 404);
