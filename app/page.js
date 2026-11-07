@@ -2,6 +2,7 @@ import { getSite, getProjects, getLang, tx } from '../lib/content';
 import { session } from '../lib/auth';
 import LangSwitch from './LangSwitch';
 import Fx from './Fx';
+import ContactForm from './ContactForm';
 import { Steps, Explorer, Layers } from './Mods';
 export const dynamic = 'force-dynamic';
 const safe = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol) ? u : null; } catch { return null; } };
@@ -15,9 +16,9 @@ export async function generateMetadata() {
 const ALL = { en: 'All', ar: 'الكل', fr: 'Tous' };
 const host = (u) => { try { return u.startsWith('mailto:') ? u.slice(7) : new URL(u).hostname.replace('www.', ''); } catch { return ''; } };
 export default async function Home({ searchParams }) {
-  const s = await getSite(), lang = getLang(), en = s.copy.en, t = s.copy[lang] || {}, c = (k) => t[k] || en[k] || '';
   const adm = searchParams?.preview ? await session() : null;
-  const P = await getProjects(!!adm); const th = s.theme;
+  const [s, P] = await Promise.all([getSite(), getProjects(!!adm)]);
+  const lang = getLang(), en = s.copy.en, t = s.copy[lang] || {}, c = (k) => t[k] || en[k] || ''; const th = s.theme;
   const social = s.socials.filter((x) => x.enabled && safe(x.url));
   const words = s.skills.flatMap((g) => g.items.map((x) => x.name));
   const nSk = words.length, sts = [...new Set(P.map((p) => p.status))];
@@ -39,7 +40,7 @@ export default async function Home({ searchParams }) {
     journey: <ol className="tl">{s.timeline.map((x, i) => <li className="rv" style={rv(i)} key={i}><b>{tx(x.label, lang)}</b><span>{tx(x.text, lang)}</span></li>)}</ol>,
     systems: <div className="two"><p className="pre big rv">{c('systems')}</p><div className="os rv" style={rv(2)} aria-hidden="true"><span>Linux</span><span>FreeBSD</span><span>Unix</span><span>LumaOS</span></div></div>,
     philosophy: <blockquote className="quote rv"><p className="pre">{c('philosophy')}</p></blockquote>,
-    contact: <><p className="rv">{c('contact_text')}</p><div className="grid">{social.map((x, i) => <a key={x.id} className="card cc rv" style={rv(i)} href={safe(x.url)} rel="noopener noreferrer" target={x.url.startsWith('mailto:') ? undefined : '_blank'}><b>{x.label}</b><span>{host(x.url)}</span></a>)}</div></>,
+    contact: <><p className="rv">{c('contact_text')}</p><div className="grid">{social.map((x, i) => <a key={x.id} className="card cc rv" style={rv(i)} href={safe(x.url)} rel="noopener noreferrer" target={x.url.startsWith('mailto:') ? undefined : '_blank'}><b>{x.label}</b><span>{host(x.url)}</span></a>)}</div><ContactForm lang={lang} /></>,
   };
   const mods = s.modules || [];
   const lv = (v) => (v && typeof v === 'object' ? tx(v, lang) : v || '');

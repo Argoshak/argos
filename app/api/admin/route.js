@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { session, sameOrigin } from '../../../lib/auth';
 import { db } from '../../../lib/supabase';
 import { getSite, getProjects, snapshot, log, ensureSeed, ID } from '../../../lib/content';
@@ -41,7 +42,7 @@ async function upload(req, who, sb) {
   if (error) return J({ error: 'Upload failed' }, 500);
   await log(who, 'upload', name); return J({ ok: true });
 }
-export async function POST(req) {
+async function handle(req) {
   if (!sameOrigin(req)) return J({ error: 'Bad origin' }, 403);
   const s = await session(); if (!s || s.mc) return J({ error: 'Unauthorized' }, 401);
   const who = s.u; const sb = db();
@@ -51,9 +52,8 @@ export async function POST(req) {
     switch (b.action) {
       case 'all': {
         await ensureSeed();
-        const [content, projects, m, a, v] = await Promise.all([getSite(), getProjects(true), media(sb),
-          sb.from('activity').select('*').order('id', { ascending: false }).limit(30), sb.from('versions').select('id,at,actor').order('id', { ascending: false }).limit(20)]);
-        return J({ content, projects, media: m, activity: a.data || [], versions: v.data || [] });
+        const [content, projects, m, msgs] = await Promise.all([getSite(true), getProjects(true), media(sb), sb.from('messages').select('*').order('id', { ascending: false }).limit(200)]);
+        return J({ content, projects, media: m, messages: msgs.data || [] });
       }
       case 'save': {
         if (!KEYS.includes(b.key)) return J({ error: 'Unknown key' }, 400);
@@ -70,6 +70,9 @@ export async function POST(req) {
         await log(who, p.id ? 'edit project' : 'create project', p.slug); return J({ ok: true });
       }
       case 'publishAll': await snapshot(who); await sb.from('projects').update({ published: true }).neq('id', '00000000-0000-0000-0000-000000000000'); await log(who, 'publish all'); return J({ ok: true });
+      case 'readMsg': if (!Number.isInteger(b.id)) return J({ error: 'Bad id' }, 400); await sb.from('messages').update({ read: !!b.read }).eq('id', b.id); return J({ ok: true });
+      case 'deleteMsg': if (!Number.isInteger(b.id)) return J({ error: 'Bad id' }, 400); await sb.from('messages').delete().eq('id', b.id); return J({ ok: true });
+      case 'reset': if (!KEYS.includes(b.key)) return J({ error: 'Unknown key' }, 400); await snapshot(who); await sb.from('site_content').delete().eq('key', b.key); return J({ ok: true });
       case 'deleteProject': await snapshot(who); await sb.from('projects').delete().eq('id', b.id); await log(who, 'delete project', b.id); return J({ ok: true });
       case 'duplicateProject': {
         const { data: p } = await sb.from('projects').select('*').eq('id', b.id).single(); if (!p) return J({ error: 'Not found' }, 404);
@@ -96,3 +99,5 @@ export async function POST(req) {
     return J({ error: 'Unknown action' }, 400);
   } catch (e) { return J({ error: 'Server error' }, 500); }
 }
+
+export async function POST(req) { const res = await handle(req); if (res.status === 200) revalidateTag('site'); return res; }

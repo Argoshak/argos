@@ -10,3 +10,6 @@ alter table site_content enable row level security; alter table projects enable 
 alter table versions enable row level security; alter table activity enable row level security;
 alter table admins enable row level security; alter table login_attempts enable row level security;
 insert into storage.buckets (id, name, public) values ('media','media',true) on conflict do nothing;
+-- contact form inbox (added in v5)
+create table if not exists messages(id bigserial primary key, at timestamptz default now(), name text, email text, message text, ip text, read boolean default false);
+alter table messages enable row level security;
