@@ -145,3 +145,4 @@ header.top{backdrop-filter:none;background:var(--navy)}.hero::before,.hero::afte
 /* v6: never allow sideways scroll (RTL fix) */
 html,.site{overflow-x:clip}
 .per{display:block;opacity:.7;font-size:13px;margin:-4px 0 8px}
+.pj img{background:#fff;padding:12px;object-fit:contain;max-height:150px;width:100%;border:1px solid var(--line)}
