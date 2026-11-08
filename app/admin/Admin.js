@@ -184,6 +184,7 @@ function Modules({ d, run }) {
         <button className="bad" onClick={() => confirm(tr('Remove this item?')) && setIt(it.filter((_, j) => j !== k))}>{tr('Remove')}</button></div>
         <label>{tr('Title')} ({l}){!x.title?.[l] && <em> — {tr('missing')}</em>}<input dir={l === 'ar' ? 'rtl' : 'ltr'} value={x.title?.[l] || ''} onChange={(y) => upI(k, { title: tl(x.title, y.target.value) })} /></label>
         <label>{tr('Text')} ({l}){!x.text?.[l] && <em> — {tr('missing')}</em>}<textarea rows={3} dir={l === 'ar' ? 'rtl' : 'ltr'} value={x.text?.[l] || ''} onChange={(y) => upI(k, { text: tl(x.text, y.target.value) })} /></label>
+        <label>URL<input dir="ltr" placeholder="https://…" value={x.url || ''} onChange={(y) => upI(k, { url: y.target.value })} /></label>
         <div className="row"><label>{tr('Category / tag')}<input value={x.tag || ''} onChange={(y) => upI(k, { tag: y.target.value })} /></label><label>{tr('Badge / date')}<input value={x.meta || ''} onChange={(y) => upI(k, { meta: y.target.value })} /></label></div></div>)}
       <button onClick={() => setIt([...it, { title: {}, text: {}, tag: '', meta: '' }])}>{tr('+ Add item')}</button> <button className="go" onClick={save}>{tr('Save modules')}</button></div>; }
   return <div><p>{tr('Each module is a section on the public site. Turn it on, choose where it appears, and edit its content in every language.')}</p>

@@ -3,6 +3,9 @@ import { session } from '../lib/auth';
 import LangSwitch from './LangSwitch';
 import Fx from './Fx';
 import ContactForm from './ContactForm';
+import Projects from './Projects';
+import Quick from './Quick';
+const VIEW = { en: 'View', ar: 'عرض', fr: 'Voir' };
 import { Steps, Explorer, Layers } from './Mods';
 export const dynamic = 'force-dynamic';
 const safe = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol) ? u : null; } catch { return null; } };
@@ -29,14 +32,7 @@ export default async function Home({ searchParams }) {
     about: <div className="two"><p className="pre rv">{c('about')}</p><div className="rv" style={rv(2)}>{c('education') && <p>{c('education')}</p>}
       <ul className="facts"><li><b>{c('location')}</b></li><li><b>{words.slice(0, 4).join(' · ')}</b></li><li><b>AR · FR · EN</b></li></ul></div></div>,
     skills: <div className="grid">{s.skills.map((g, i) => <div className="card rv" style={rv(i)} key={i}><h3>{tx(g.cat, lang)}</h3><ul className="chips">{g.items.map((x) => <li key={x.name} title={x.note || undefined}>{x.name}</li>)}</ul></div>)}</div>,
-    projects: P.length ? <><div className="pills">{['all', ...sts].map((f, i) => <button key={f} data-f={f} aria-pressed={i === 0}>{f === 'all' ? ALL[lang] : c('st_' + f)}</button>)}</div>
-      <div className="grid">{P.map((p, i) => { const d = p.data, L = safe(d.live), R = safe(d.repo), ti = tx(d.title, lang); return (
-        <article className="card pj rv" style={rv(i)} data-s={p.status} key={p.id}>
-          {d.image ? <img src={d.image} alt={ti} loading="lazy" /> : <div className="ph" aria-hidden="true"><b>{ini(ti)}</b></div>}
-          <h3>{ti} <span className="badge">{c('st_' + p.status) || p.status}</span></h3>{d.period && <small className="per">{d.period}</small>}<p>{tx(d.summary, lang)}</p>
-          <ul className="chips">{(d.tech || []).map((x) => <li key={x}>{x}</li>)}</ul>
-          {tx(d.case, lang) && <details><summary>{c('case')}</summary><p className="pre">{tx(d.case, lang)}</p></details>}
-          <p className="links">{L && <a className="btn p sm" href={L} target="_blank" rel="noopener noreferrer">{c('view_live')} ↗</a>}{R && <a className="btn o sm" href={R} target="_blank" rel="noopener noreferrer">{c('view_code')}</a>}</p></article>); })}</div></> : <p>{c('no_projects')}</p>,
+    projects: P.length ? <Projects labels={{ all: ALL[lang], live: c('view_live'), code: c('view_code'), case: c('case') }} items={P.map((p) => ({ id: p.id, title: tx(p.data.title, lang), summary: tx(p.data.summary, lang), case: tx(p.data.case, lang), tech: p.data.tech || [], status: p.status, statusLabel: c('st_' + p.status) || p.status, period: p.data.period || '', image: p.data.image || '', ini: ini(tx(p.data.title, lang)), live: safe(p.data.live) || '', repo: safe(p.data.repo) || '' }))} /> : <p>{c('no_projects')}</p>,
     journey: <ol className="tl">{s.timeline.map((x, i) => <li className="rv" style={rv(i)} key={i}><b>{tx(x.label, lang)}</b><span>{tx(x.text, lang)}</span></li>)}</ol>,
     systems: <div className="two"><p className="pre big rv">{c('systems')}</p><div className="os rv" style={rv(2)} aria-hidden="true"><span>Linux</span><span>FreeBSD</span><span>Unix</span><span>LumaOS</span></div></div>,
     philosophy: <blockquote className="quote rv"><p className="pre">{c('philosophy')}</p></blockquote>,
@@ -44,7 +40,7 @@ export default async function Home({ searchParams }) {
   };
   const mods = s.modules || [];
   const lv = (v) => (v && typeof v === 'object' ? tx(v, lang) : v || '');
-  const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: lv(i.tag), meta: lv(i.meta) }));
+  const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: lv(i.tag), meta: lv(i.meta), url: i.url || '' }));
     if (m.type === 'layers') return <Layers items={it} />;
     if (m.type === 'bars') { const src = m.auto === 'ecosystem' ? Object.entries((mods.find((x) => x.id === 'ecosystem')?.items || []).reduce((a, i) => { const g = lv(i.tag); a[g] = (a[g] || 0) + 1; return a; }, {})).map(([t, v]) => ({ t, v })) : it.map((i) => ({ t: i.t, v: parseFloat(i.meta) || 0 })); const mx = Math.max(1, ...src.map((b) => b.v));
       return <div className="bars">{src.map((b) => <div className="bar rv" key={b.t}><span>{b.t}</span><div><i style={{ '--w': (b.v / mx) * 100 + '%' }} /></div><b>{b.v}</b></div>)}</div>; }
@@ -52,14 +48,16 @@ export default async function Home({ searchParams }) {
     if (m.type === 'explorer') return <Explorer items={it} all={ALL[lang]} />;
     if (m.type === 'list') return <ol className="tl">{it.map((i, k) => <li className="rv" key={k}><b>{i.t} {i.meta && <span className="badge">{i.meta}</span>}</b><span>{i.x}</span></li>)}</ol>;
     if (m.type === 'editorial') return <div className="ed">{it.filter((i) => i.x).map((i, k) => <div className="rv" key={k}><h3>{i.t}</h3><p className="pre">{i.x}</p></div>)}<ul className="chips big">{it.filter((i) => !i.x).map((i, k) => <li className="rv" key={k}><span>{i.t}</span></li>)}</ul></div>;
-    return <div className="grid">{it.map((i, k) => <div className="card rv" style={rv(k)} key={k}><span className="num">{String(k + 1).padStart(2, '0')}</span><h3>{i.t}</h3><p className="pre">{i.x}</p>{i.meta && <span className="badge">{i.meta}</span>}</div>)}</div>; };
+    return <div className="grid">{it.map((i, k) => <div className="card rv" style={rv(k)} key={k}><span className="num">{String(k + 1).padStart(2, '0')}</span><h3>{i.t}</h3><p className="pre">{i.x}</p>{i.meta && <span className="badge">{i.meta}</span>}{safe(i.url) && <p className="links"><a href={safe(i.url)} target="_blank" rel="noopener noreferrer">{VIEW[lang]} ↗</a></p>}</div>)}</div>; };
   const secs = s.sections.filter((x) => x.enabled), dark = ['skills', 'systems'];
+  const toc = secs.flatMap((x) => [{ id: x.id, t: c('nav_' + x.id) }, ...mods.filter((m) => m.enabled && (m.at || 'projects') === x.id).map((m) => ({ id: m.id, t: tx(m.title, lang) }))]);
+  const qs = [...toc.map((e) => ({ t: e.t, id: e.id, s: '' })), ...P.map((p) => ({ t: tx(p.data.title, lang), id: 'projects', s: c('nav_projects') })), ...mods.filter((m) => m.enabled).flatMap((m) => (m.items || []).map((i) => ({ t: tx(i.title, lang), id: m.id, s: tx(m.title, lang) })))];
   return (
     <div className="site" style={{ '--navy': th.navy, '--royal': th.royal, '--gold': th.gold, '--bg0': th.bg, '--r': th.radius }}>
       <div id="pg" /><Fx />
       {adm && <div className="prev">Preview mode: unpublished projects are visible only to you.</div>}
       <header className="top"><div className="wrap"><a className="logo" href="#top" aria-label="Home">ZA</a>
-        <nav aria-label="Main">{secs.map((x) => <a key={x.id} href={'#' + x.id}>{c('nav_' + x.id)}</a>)}</nav>
+        <nav aria-label="Main">{secs.map((x) => <a key={x.id} href={'#' + x.id}>{c('nav_' + x.id)}</a>)}</nav><Quick entries={qs} lang={lang} /><nav className="toc" aria-label="Sections">{toc.map((e) => <a key={e.id} href={'#' + e.id}>{e.t}</a>)}</nav>
         <button id="th" aria-label="Theme">◐</button><LangSwitch lang={lang} /><button id="bg" aria-label="Menu">☰</button></div></header>
       <main>
         <div className="hero" id="top"><div className="wrap">
@@ -69,7 +67,7 @@ export default async function Home({ searchParams }) {
             </div>
           <div className="av"><img src={s.identity.photo} alt={c('photo_alt')} width="340" height="340" /></div>
         </div></div>
-        <div className="wrap"><div className="statbar">{P.length > 0 && <div><b>{P.length}</b>{c('nav_projects')}</div>}<div><b>{nSk}</b>{c('nav_skills')}</div><div><b>3</b>AR · FR · EN</div></div></div>
+        <div className="wrap"><div className="statbar">{P.length > 0 && <div><b data-count={P.length}>{P.length}</b>{c('nav_projects')}</div>}<div><b data-count={nSk}>{nSk}</b>{c('nav_skills')}</div><div><b>3</b>AR · FR · EN</div></div></div>
         <div className="mq" aria-hidden="true"><div>{[...words, ...words].map((w, k) => <span key={k}>{w}</span>)}</div></div>
         {(() => { let n = 0; const sec = (id, title, intro, inner, cls) => { n++; return <section id={id} key={id} className={cls}><div className="wrap"><div className="hd rv"><h2><i>{String(n).padStart(2, '0')}</i>{title}</h2>{intro && <p className="lead">{intro}</p>}</div>{inner}</div></section>; };
           return secs.flatMap((x) => [sec(x.id, c('nav_' + x.id), '', body[x.id], dark.includes(x.id) ? 'dk' : n % 2 ? 'alt' : ''), ...mods.filter((m) => m.enabled && (m.at || 'projects') === x.id).map((m) => sec(m.id, tx(m.title, lang), tx(m.intro, lang), modBody(m), n % 2 ? 'alt' : ''))]); })()}

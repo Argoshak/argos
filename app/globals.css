@@ -143,6 +143,31 @@ header.top{backdrop-filter:none;background:var(--navy)}.hero::before,.hero::afte
 @media(max-width:860px){.ax.adm{grid-template-columns:1fr}.ax-side{position:static;height:auto;display:flex;flex-wrap:wrap;gap:4px}.ax-side .brand{width:100%}.ax-side button{width:auto}.ax .ax-2{grid-template-columns:1fr}.ax-main{padding:0 14px 80px}}
 
 /* v6: never allow sideways scroll (RTL fix) */
-html,.site{overflow-x:clip}
+.site{overflow-x:clip}
 .per{display:block;opacity:.7;font-size:13px;margin:-4px 0 8px}
 .pj img{background:#fff;padding:12px;object-fit:contain;max-height:150px;width:100%;border:1px solid var(--line)}
+.pj img{padding:0;background:none;object-fit:cover;object-position:top;aspect-ratio:16/9;max-height:none;border:1px solid var(--line)}
+/* v9: interactions, mobile, selectable text */
+.rv{opacity:1;transform:none}.js .rv{opacity:0;transform:translateY(26px)}.js .rv.in{opacity:1;transform:none}
+.site,.site p,.site li,.site h1,.site h2,.site h3,.site span,.site small,.site b,.site a{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}.site{-webkit-tap-highlight-color:transparent}
+.hero{--sy:0px}.hero::before{translate:0 var(--sy)}.av{transition:transform .25s ease-out}
+.qb,#th,#bg{min-height:40px;min-width:40px;display:inline-grid;place-items:center;background:none;border:1px solid #ffffff55;color:#fff;border-radius:var(--r);font-size:18px;cursor:pointer}
+.modal{position:fixed;inset:0;background:#050b2ccc;z-index:50;display:grid;place-items:center;padding:14px;overflow:auto;animation:pin .2s}
+.mbox{background:var(--card);color:var(--ink);border-radius:20px;max-width:780px;width:100%;max-height:92vh;overflow:auto;padding:22px;position:relative;border-top:6px solid var(--gold)}
+.mx{position:absolute;inset-inline-end:10px;top:6px;font-size:32px;line-height:1;background:none;border:0;color:inherit;cursor:pointer;min-width:44px;min-height:44px}.mbox img{width:100%;border-radius:12px;margin:8px 0 12px}
+.qbox input{width:100%;padding:14px;border:2px solid var(--gold);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;margin-top:18px}.qbox ul{list-style:none;padding:0;margin:10px 0 0}
+.qbox li button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:start;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 4px;color:inherit;min-height:46px;font:inherit;cursor:pointer}.qbox li button:hover{background:var(--alt)}.qbox small{opacity:.65}.nr{padding:14px;opacity:.7}
+@media(min-width:861px){.toc{display:none!important}}
+@media(max-width:860px){
+ header.top .wrap{gap:6px;min-height:54px}.lang button{padding:4px 8px;font-size:13px;margin-inline-start:2px}
+ nav:not(.toc){display:none!important}
+ .toc{display:none;position:absolute;top:57px;inset-inline:0;background:var(--navy);padding:8px 16px 16px;margin:0;border-bottom:3px solid var(--gold);max-height:78vh;overflow:auto;grid-template-columns:1fr 1fr;gap:0 14px;flex-direction:initial}
+ body.menu .toc{display:grid}.toc a{color:#dbe3ff!important;text-decoration:none;padding:12px 4px;border-bottom:1px solid #ffffff1c;font-size:15px;border-radius:0;white-space:normal}.toc a.on{background:none;color:var(--gold)!important}
+ #bg{margin-inline-start:auto}
+ .hero{padding:44px 0 100px}.hero h1{font-size:clamp(32px,10vw,46px)}.role{font-size:15px}.hero .btn{margin-bottom:8px;padding:12px 20px}.av{width:min(240px,70%);margin-top:6px}
+ .statbar{grid-template-columns:repeat(3,1fr);padding:16px 4px;margin-top:-56px}.statbar>div{font-size:12px}.statbar b{font-size:26px}
+ section{padding:46px 0}h2{font-size:24px}.hd .lead{font-size:16px}.grid{grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px}.card{padding:16px}.ph{margin:-16px -16px 14px}
+ .stack button{width:100%!important}.bar{grid-template-columns:96px 1fr 26px;gap:8px;font-size:14px}.panel{padding:18px}.mbox{padding:16px;max-height:94vh}
+ .pills button,.btn,.stp ol button,.chips.big button{min-height:44px}.cf{max-width:100%}#up{width:48px;height:48px}.mq span{padding:5px 14px;font-size:14px}.tl{padding-inline-start:20px}.tl li::before{inset-inline-start:-31px}
+}
+@media(hover:none){.card:hover,.btn:hover,.stack button:hover,.os span:hover,.chips.big li>span:hover{transform:none;box-shadow:none}.av:hover::before{inset:16px -16px -16px 16px}}
