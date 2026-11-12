@@ -25,11 +25,14 @@ export default function StackMap({ nodes, avatar, hint, label }) {
       const r = Math.min(W, H) * 0.075; ctx.globalAlpha = 1; ctx.save(); ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, 7); ctx.clip(); if (img.complete && img.naturalWidth) ctx.drawImage(img, W / 2 - r, H / 2 - r, r * 2, r * 2); ctx.restore();
       ctx.strokeStyle = col.gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(W / 2, H / 2, r + 3, 0, 7); ctx.stroke();
       ctx.font = FONT; ctx.textBaseline = 'middle';
-      N.forEach((n) => { const on = n.id === hn, rel = near && near.has(n.id), dim = hn && !on && !rel; ctx.globalAlpha = dim ? 0.25 : 1; ctx.fillStyle = on || rel ? col.gold : col.ink; ctx.beginPath(); ctx.arc(n.x, n.y, on ? 6.5 : 4, 0, 7); ctx.fill();
+      N.forEach((n) => { const on = n.id === hn, rel = near && near.has(n.id), dim = hn && !on && !rel; ctx.globalAlpha = dim ? 0.25 : 1; ctx.fillStyle = on || rel ? col.gold : col.ink; ctx.beginPath(); ctx.arc(n.x, n.y, on ? 6.5 : 4, 0, 7); ctx.fill(); if (on) { ctx.strokeStyle = col.gold; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(n.x, n.y, 12, 0, 7); ctx.stroke(); }
         ctx.fillStyle = on ? col.gold : col.ink; const tw = ctx.measureText(n.t).width, rr = toRight(n.x, tw); ctx.direction = /[\u0600-\u06FF]/.test(n.t) ? 'rtl' : 'ltr'; ctx.textAlign = rr ? 'left' : 'right'; ctx.fillText(n.t, n.x + (rr ? 10 : -10), n.y); });
       ctx.globalAlpha = 1;
     };
-    const step = () => { if (vis) { N.forEach((n) => { if (n.id === drag) return; if (!reduce) { n.vx += (n.ax - n.x) * 0.025; n.vy += (n.ay - n.y) * 0.025; const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy); if (d < 90 && d > 0) { const f = ((90 - d) / 90) * 1.6; n.vx += (dx / d) * f; n.vy += (dy / d) * f; } n.vx *= 0.84; n.vy *= 0.84; n.x += n.vx; n.y += n.vy; } else { n.x = n.ax; n.y = n.ay; } }); draw(); } raf = requestAnimationFrame(step); };
+    const step = () => { if (vis) { const t = performance.now() / 1000, hn = hover || drag, H0 = hn ? by[hn] : null, near = hn ? nb(hn) : null;
+      N.forEach((n, i) => { if (n.id === drag) return; if (reduce) { n.x = n.ax; n.y = n.ay; return; } let tx = n.ax, ty = n.ay;
+        if (n.id === hn) { n.vx *= 0.4; n.vy *= 0.4; } else { tx += Math.sin(t * 0.8 + i * 1.7) * 3; ty += Math.cos(t * 0.7 + i * 2.3) * 3; if (near && near.has(n.id)) { tx += (H0.ax - n.ax) * 0.1; ty += (H0.ay - n.ay) * 0.1; } }
+        n.vx += (tx - n.x) * 0.07; n.vy += (ty - n.y) * 0.07; n.vx *= 0.8; n.vy *= 0.8; n.x += n.vx; n.y += n.vy; }); draw(); } raf = requestAnimationFrame(step); };
     const pick = (x, y) => { let b = null, bd = 26; N.forEach((n) => { const d = Math.hypot(n.x - x, n.y - y); if (d < bd) { bd = d; b = n; } }); return b; };
     const pos = (e) => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
     const show = (p) => setTip(p ? { n: p, x: Math.min(Math.max(p.x, 90), W - 90), y: p.y } : null);

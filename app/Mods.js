@@ -14,7 +14,8 @@ export function Explorer({ items, all }) {
     <div className="panel" key={cur.t} aria-live="polite"><h3>{cur.t} {cur.tag && <span className="badge">{cur.tag}</span>}</h3>{cur.x && <p>{cur.x}</p>}</div></div>;
 }
 export function Layers({ items }) {
-  const [a, setA] = useState(0), it = items[a]; if (!it) return null;
-  return <div className="lay"><div className="stack">{items.map((x, k) => <button key={k} aria-pressed={k === a} style={{ '--k': k }} onClick={() => setA(k)}><b>{x.t}</b></button>)}</div>
-    <div className="panel" key={a} aria-live="polite"><h3>{it.t}</h3><p>{it.x}</p><ul className="chips">{it.meta.split(' · ').map((t) => <li key={t}>{t}</li>)}</ul></div></div>;
+  const [a, setA] = useState(0), it = items[a]; if (!it) return null; const n = items.length - 1;
+  return <div className="lay"><div className="iso"><div className="plates">{items.map((x, k) => <button key={k} className="plate" style={{ '--k': k, '--n': n }} aria-pressed={k === a} aria-label={x.t} onMouseEnter={() => setA(k)} onFocus={() => setA(k)} onClick={() => setA(k)}>{String(k + 1).padStart(2, '0')}</button>)}</div></div>
+    <div className="lay-r"><div className="stack">{items.map((x, k) => <button key={k} aria-pressed={k === a} onMouseEnter={() => setA(k)} onClick={() => setA(k)}><b>{x.t}</b></button>)}</div>
+      <div className="panel" key={a} aria-live="polite"><h3>{it.t}</h3><p>{it.x}</p><ul className="chips">{it.meta.split(' · ').map((t) => <li key={t}>{t}</li>)}</ul></div></div></div>;
 }

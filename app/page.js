@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 const VIEW = { en: 'View', ar: 'عرض', fr: 'Voir' }, ALL = { en: 'All', ar: 'الكل', fr: 'Tous' };
 const HINT = { en: 'Hover a node · drag it · double-click to open the ecosystem', ar: 'مرّر على عقدة · اسحبها · انقر مرتين لفتح المنظومة', fr: "Survolez un nœud · glissez · double-clic pour l'écosystème" };
 const LBL = { en: 'Interactive map of the technologies I use', ar: 'خريطة تفاعلية للتقنيات التي أستخدمها', fr: 'Carte interactive des technologies que j\'utilise' };
+const KH = { en: 'to search or jump to any section', ar: 'للبحث أو الانتقال لأي قسم', fr: 'pour rechercher ou aller à une section' };
 const safe = (u) => { try { return ['http:', 'https:', 'mailto:'].includes(new URL(u).protocol) ? u : null; } catch { return null; } };
 const host = (u) => { try { return u.startsWith('mailto:') ? u.slice(7) : new URL(u).hostname.replace('www.', ''); } catch { return ''; } };
 export async function generateMetadata() {
@@ -66,15 +67,16 @@ export default async function Home({ searchParams }) {
         <nav aria-label="Main">{secs.map((x) => <a key={x.id} href={'#' + x.id}>{c('nav_' + x.id)}</a>)}</nav>
         <Quick entries={qs} lang={lang} /><button id="th" aria-label="Theme">◐</button><LangSwitch lang={lang} /><button id="bg" aria-label="Menu">☰</button>
         <nav className="toc" aria-label="Sections">{toc.map((e) => <a key={e.id} href={'#' + e.id}>{e.t}</a>)}</nav></div></header>
+      <aside className="rail" aria-label="Sections">{secs.map((x) => <a key={x.id} href={'#' + x.id} data-l={c('nav_' + x.id)} aria-label={c('nav_' + x.id)} />)}</aside>
       <main>
-        <div className="hero" id="top"><div className="wrap">
+        <div className="hero" id="top"><div className="spot" /><div className="wrap">
           <div className="hl"><p className="eyebrow">{c('location')}</p>
             <h1>{nm.map((w, k) => <span key={k} className={k ? 'a' : ''} style={{ animationDelay: k * 140 + 'ms' }}>{w}{' '}</span>)}</h1>
             <p className="role">{c('role')}</p>
             <p className="tag">{c('tagline')} <span className="cycle" data-words={words.join('|')}>{words[0]}</span></p>
             <p className="cta"><a className="btn p" href="#projects">{c('cta_projects')}</a><a className="btn s" href="#contact">{c('cta_contact')}</a></p>
             <p className="links soc">{links('')}</p>
-            <div className="stats">{P.length > 0 && <div><b data-count={P.length}>{P.length}</b><small>{c('nav_projects')}</small></div>}<div><b data-count={nSk}>{nSk}</b><small>{c('nav_skills')}</small></div><div><b>3</b><small>AR · FR · EN</small></div></div></div>
+            <div className="stats">{P.length > 0 && <div><b data-count={P.length}>{P.length}</b><small>{c('nav_projects')}</small></div>}<div><b data-count={nSk}>{nSk}</b><small>{c('nav_skills')}</small></div><div><b>3</b><small>AR · FR · EN</small></div></div><p className="kh"><kbd>Ctrl K</kbd> {KH[lang]}</p></div>
           <StackMap nodes={mapNodes} avatar={s.identity.photo} hint={HINT[lang]} label={LBL[lang]} />
         </div>
           <svg className="cut" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,10 100,0 100,10" style={{ fill: 'var(--bg)' }} /><line x1="0" y1="10" x2="100" y2="0" style={{ stroke: 'var(--gold)' }} strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg></div>

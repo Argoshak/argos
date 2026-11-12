@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Portal from './Portal';
 export default function Projects({ items, labels }) {
   const [f, setF] = useState('all'), [open, setOpen] = useState(null);
   const sts = [...new Set(items.map((p) => p.status))], list = items.filter((p) => f === 'all' || p.status === f), cur = items.find((p) => p.id === open);
@@ -12,9 +13,9 @@ export default function Projects({ items, labels }) {
       <h3>{p.title} <span className="badge">{p.statusLabel}</span></h3>{p.period && <small className="per">{p.period}</small>}<p>{p.summary}</p>
       <ul className="chips">{p.tech.map((x) => <li key={x}>{x}</li>)}</ul>
       <p className="links">{p.case && <button className="btn p sm" onClick={() => setOpen(p.id)}>{labels.case}</button>}{p.live && <a className="btn o sm" href={p.live} target="_blank" rel="noopener noreferrer">{labels.live} ↗</a>}</p></article>)}</div>
-    {cur && <div className="modal" role="dialog" aria-modal="true" aria-label={cur.title} onClick={(e) => e.target === e.currentTarget && setOpen(null)}><div className="mbox">
+    {cur && <Portal><div className="modal" role="dialog" aria-modal="true" aria-label={cur.title} onClick={(e) => e.target === e.currentTarget && setOpen(null)}><div className="mbox">
       <button className="mx" onClick={() => setOpen(null)} aria-label="Close">×</button>{cur.image && <div className="shot"><img src={cur.image} alt={cur.title} /></div>}
       <h3>{cur.title} <span className="badge">{cur.statusLabel}</span></h3>{cur.period && <small className="per">{cur.period}</small>}<p className="pre">{cur.case}</p>
-      <ul className="chips">{cur.tech.map((x) => <li key={x}>{x}</li>)}</ul><Links p={cur} /></div></div>}
+      <ul className="chips">{cur.tech.map((x) => <li key={x}>{x}</li>)}</ul><Links p={cur} /></div></div></Portal>}
   </>;
 }
