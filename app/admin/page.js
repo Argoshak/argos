@@ -1,3 +1,4 @@
+import '../admin.css';
 import { session } from '../../lib/auth';
 import Admin from './Admin';
 import { getLang } from '../../lib/content';

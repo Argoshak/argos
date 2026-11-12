@@ -8,12 +8,12 @@ export default function Projects({ items, labels }) {
   return <>
     <div className="pills">{['all', ...sts].map((s) => <button key={s} aria-pressed={f === s} onClick={() => setF(s)}>{s === 'all' ? labels.all : items.find((p) => p.status === s).statusLabel}</button>)}</div>
     <div className="grid">{list.map((p) => <article className="card pj rv in" key={p.id}>
-      {p.image ? <img src={p.image} alt={p.title} loading="lazy" /> : <div className="ph" aria-hidden="true"><b>{p.ini}</b></div>}
+      <div className="shot">{p.image ? <img src={p.image} alt={p.title} loading="lazy" /> : <div className="ph" aria-hidden="true"><b>{p.ini}</b></div>}</div>
       <h3>{p.title} <span className="badge">{p.statusLabel}</span></h3>{p.period && <small className="per">{p.period}</small>}<p>{p.summary}</p>
       <ul className="chips">{p.tech.map((x) => <li key={x}>{x}</li>)}</ul>
       <p className="links">{p.case && <button className="btn p sm" onClick={() => setOpen(p.id)}>{labels.case}</button>}{p.live && <a className="btn o sm" href={p.live} target="_blank" rel="noopener noreferrer">{labels.live} ↗</a>}</p></article>)}</div>
     {cur && <div className="modal" role="dialog" aria-modal="true" aria-label={cur.title} onClick={(e) => e.target === e.currentTarget && setOpen(null)}><div className="mbox">
-      <button className="mx" onClick={() => setOpen(null)} aria-label="Close">×</button>{cur.image && <img src={cur.image} alt={cur.title} />}
+      <button className="mx" onClick={() => setOpen(null)} aria-label="Close">×</button>{cur.image && <div className="shot"><img src={cur.image} alt={cur.title} /></div>}
       <h3>{cur.title} <span className="badge">{cur.statusLabel}</span></h3>{cur.period && <small className="per">{cur.period}</small>}<p className="pre">{cur.case}</p>
       <ul className="chips">{cur.tech.map((x) => <li key={x}>{x}</li>)}</ul><Links p={cur} /></div></div>}
   </>;

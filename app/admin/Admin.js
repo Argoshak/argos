@@ -165,7 +165,7 @@ function Search({ d, go }) {
   return <div><input placeholder="Search projects, modules and texts…" value={q} onChange={(e) => setQ(e.target.value)} />{n && !hits.length && <p>{tr('No results.')}</p>}
     {hits.slice(0, 40).map((h, i) => <p key={i}><button onClick={() => go(h[0])}>{h[0]}</button> {h[1]}</p>)}</div>;
 }
-const TYPES = ['cards', 'editorial', 'steps', 'explorer', 'list', 'layers', 'bars'], AT = ['about', 'skills', 'projects', 'journey', 'systems', 'philosophy', 'contact'];
+const TYPES = ['cards', 'editorial', 'steps', 'explorer', 'list', 'layers', 'bars', 'flow'], AT = ['about', 'skills', 'projects', 'journey', 'systems', 'philosophy', 'contact'];
 function Modules({ d, run }) {
   const [M, setM] = useState(d.content.modules || []), [e, setE] = useState(null), [l, setL] = useState('en');
   const mv = (a, i, k) => { const b = [...a]; if (i + k < 0 || i + k >= b.length) return b; [b[i], b[i + k]] = [b[i + k], b[i]]; return b; };
