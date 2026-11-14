@@ -4,6 +4,7 @@ export default function Fx() {
   useEffect(() => {
     const d = document, h = d.documentElement, fine = matchMedia('(hover:hover) and (pointer:fine)').matches, reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
     h.classList.add('js');
+    d.getElementById('th')?.setAttribute('aria-checked', String((localStorage.getItem('th') || 'dark') === 'dark'));
     try { h.dataset.theme = localStorage.getItem('th') || 'dark'; } catch {}
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0, rootMargin: '0px 0px -4% 0px' });
     const watch = (root) => root.querySelectorAll?.('.rv:not(.in)').forEach((el) => io.observe(el));
@@ -27,13 +28,13 @@ export default function Fx() {
         if (fine && !reduce && !cd.classList.contains('cc')) { if (tilted && tilted !== cd) reset(tilted); tilted = cd; const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; cd.style.transition = 'transform .12s ease-out'; cd.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`; } }
       else if (tilted) { reset(tilted); tilted = null; }
       const hr = t.closest('.hero'); if (hr) { const r = hr.getBoundingClientRect(); hr.style.setProperty('--hx', e.clientX - r.left + 'px'); hr.style.setProperty('--hy', e.clientY - r.top + 'px'); }
-      const mb = fine && !reduce ? t.closest('.cta .btn') : null; if (mag && mag !== mb) { reset(mag); mag = null; } if (mb) { mag = mb; const r = mb.getBoundingClientRect(); mb.style.transition = 'transform .15s ease-out'; mb.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * 0.18).toFixed(1)}px,${((e.clientY - r.top - r.height / 2) * 0.3).toFixed(1)}px)`; }
+      const mb = fine && !reduce ? t.closest('.cta .btn.s') : null; if (mag && mag !== mb) { reset(mag); mag = null; } if (mb) { mag = mb; const r = mb.getBoundingClientRect(); mb.style.transition = 'transform .15s ease-out'; mb.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * 0.18).toFixed(1)}px,${((e.clientY - r.top - r.height / 2) * 0.3).toFixed(1)}px)`; }
       if (ring) ring.classList.toggle('big', !!t.closest('a,button,summary,.card,input,textarea,.mapcv,.plate')); };
     d.addEventListener('pointermove', pm, { passive: true });
     const out = () => { reset(tilted); tilted = null; reset(mag); mag = null; if (ring) ring.style.opacity = 0; }, inn = () => { if (ring) ring.style.opacity = 1; };
     d.documentElement.addEventListener('mouseleave', out); d.documentElement.addEventListener('mouseenter', inn);
     const click = (e) => { if (e.target.closest('#bg')) d.body.classList.toggle('menu'); if (e.target.closest('nav a')) d.body.classList.remove('menu');
-      if (e.target.closest('#th')) { const t = h.dataset.theme === 'dark' ? 'light' : 'dark'; h.dataset.theme = t; try { localStorage.setItem('th', t); } catch {} } };
+      if (e.target.closest('#th')) { const t = h.dataset.theme === 'dark' ? 'light' : 'dark'; h.dataset.theme = t; d.getElementById('th')?.setAttribute('aria-checked', String(t === 'dark')); try { localStorage.setItem('th', t); } catch {} } };
     d.addEventListener('click', click);
     const cy2 = d.querySelector('.cycle'), w = (cy2?.dataset.words || '').split('|'); let i = 0;
     const iv = cy2 && w.length > 1 && setInterval(() => { cy2.classList.add('sw'); setTimeout(() => { i = (i + 1) % w.length; cy2.textContent = w[i]; cy2.classList.remove('sw'); }, 250); }, 2200);

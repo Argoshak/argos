@@ -13,6 +13,6 @@ export default function Quick({ entries, lang }) {
   useEffect(() => { if (o) r.current?.focus(); }, [o]);
   const key = (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); setI((x) => Math.min(hits.length - 1, x + 1)); } if (e.key === 'ArrowUp') { e.preventDefault(); setI((x) => Math.max(0, x - 1)); } if (e.key === 'Enter') run(hits[i]); };
   return <><button className="qb" onClick={() => setO(true)} aria-label={t.ph}>⌕<span className="kbd">Ctrl K</span></button>{o && <Portal><div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && setO(false)}><div className="mbox qbox">
-    <input ref={r} value={q} onChange={(e) => { setQ(e.target.value); setI(0); }} onKeyDown={key} placeholder={t.ph} aria-label={t.ph} />
+    <input ref={r} autoFocus value={q} onChange={(e) => { setQ(e.target.value); setI(0); }} onKeyDown={key} placeholder={t.ph} aria-label={t.ph} />
     <ul>{hits.map((h, k) => <li key={k}><button className={k === i ? 'sel' : ''} onMouseEnter={() => setI(k)} onClick={() => run(h)}><b>{h.t}</b><small>{h.s}</small></button></li>)}{!hits.length && <li className="nr">{t.no}</li>}</ul></div></div></Portal>}</>;
 }

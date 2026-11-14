@@ -35,10 +35,11 @@ export default async function Home({ searchParams }) {
   const lv = (v) => (v && typeof v === 'object' ? tx(v, lang) : v || '');
   const eco = mods.find((m) => m.id === 'ecosystem')?.items || [], rad = (mods.find((m) => m.id === 'radar')?.items || []).filter((i) => i.tag?.en === 'Exploring');
   const mapNodes = [...eco, ...rad].map((i) => ({ id: i.title?.en || tx(i.title, 'en'), t: tx(i.title, lang), g: lv(i.tag), d: tx(i.text, lang) }));
+  const tips = Object.fromEntries(eco.map((i) => [i.title?.en || '', tx(i.text, lang)]));
   const body = {
     about: <div className="two"><p className="pre rv">{c('about')}</p><div className="rv" style={rv(2)}>{c('education') && <p>{c('education')}</p>}
       <ul className="facts"><li><small>◆</small><b>{c('location')}</b></li><li><small>◆</small><b>{words.slice(0, 4).join(' · ')}</b></li><li><small>◆</small><b>AR · FR · EN</b></li></ul></div></div>,
-    skills: <div className="grid">{s.skills.map((g, i) => <div className="card rv" style={rv(i)} key={i}><h3>{tx(g.cat, lang)}</h3><ul className="chips">{g.items.map((x) => <li key={x.name} title={x.note || undefined}>{x.name}</li>)}</ul></div>)}</div>,
+    skills: <div className="grid">{s.skills.map((g, i) => <div className="card tips rv" style={rv(i)} key={i}><h3>{tx(g.cat, lang)}</h3><ul className="chips">{g.items.map((x) => <li key={x.name} data-tip={tips[x.name] || x.note || undefined} tabIndex={tips[x.name] ? 0 : undefined}>{x.name}</li>)}</ul></div>)}</div>,
     projects: P.length ? <Projects labels={{ all: ALL[lang], live: c('view_live'), code: c('view_code'), case: c('case') }} items={P.map((p) => ({ id: p.id, title: tx(p.data.title, lang), summary: tx(p.data.summary, lang), case: tx(p.data.case, lang), tech: p.data.tech || [], status: p.status, statusLabel: c('st_' + p.status) || p.status, period: p.data.period || '', image: p.data.image || '', ini: ini(tx(p.data.title, lang)), live: safe(p.data.live) || '', repo: safe(p.data.repo) || '' }))} /> : <p>{c('no_projects')}</p>,
     journey: <ol className="tl">{s.timeline.map((x, i) => <li className="rv" style={rv(i)} key={i}><b>{tx(x.label, lang)}</b><span>{tx(x.text, lang)}</span></li>)}</ol>,
     systems: <div className="two"><p className="pre big rv">{c('systems')}</p><div className="os rv" style={rv(2)} aria-hidden="true"><span>Linux</span><span>FreeBSD</span><span>Unix</span><span>LumaOS</span></div></div>,
@@ -65,7 +66,7 @@ export default async function Home({ searchParams }) {
       {adm && <div className="prev">Preview mode: unpublished projects are visible only to you.</div>}
       <header className="top"><div className="wrap"><a className="logo" href="#top" aria-label="Home">ZA</a>
         <nav aria-label="Main">{secs.map((x) => <a key={x.id} href={'#' + x.id}>{c('nav_' + x.id)}</a>)}</nav>
-        <Quick entries={qs} lang={lang} /><button id="th" aria-label="Theme">◐</button><LangSwitch lang={lang} /><button id="bg" aria-label="Menu">☰</button>
+        <Quick entries={qs} lang={lang} /><button id="th" className="tsw" role="switch" aria-checked="true" aria-label="Theme"><span className="knob" /></button><LangSwitch lang={lang} /><button id="bg" aria-label="Menu"><i /><i /><i /></button>
         <nav className="toc" aria-label="Sections">{toc.map((e) => <a key={e.id} href={'#' + e.id}>{e.t}</a>)}</nav></div></header>
       <aside className="rail" aria-label="Sections">{secs.map((x) => <a key={x.id} href={'#' + x.id} data-l={c('nav_' + x.id)} aria-label={c('nav_' + x.id)} />)}</aside>
       <main>
