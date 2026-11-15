@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 const EDGES = [['JavaScript', 'React'], ['JavaScript', 'TypeScript'], ['TypeScript', 'Next.js'], ['React', 'Next.js'], ['Tailwind CSS', 'Next.js'], ['CSS3', 'Tailwind CSS'], ['HTML', 'CSS3'], ['Next.js', 'Supabase'], ['Supabase', 'PostgreSQL'], ['SQL', 'PostgreSQL'], ['Next.js', 'Vercel'], ['GitHub', 'Vercel'], ['Git', 'GitHub'], ['Cursor', 'Claude'], ['Cursor', 'Git'], ['Arch Linux', 'Fedora'], ['FreeBSD', 'Oracle Solaris 11.4'], ['Oracle Solaris 11.4', 'illumos'], ['LumaOS kernel work', 'Linux app compatibility'], ['Linux app compatibility', 'FreeBSD'], ['LumaOS kernel work', 'FreeBSD']];
-export default function StackMap({ nodes, avatar, hint, label }) {
+export default function StackMap({ nodes, avatar, hint, hintTouch, label }) {
   const cv = useRef(null), [tip, setTip] = useState(null);
   useEffect(() => {
     const c = cv.current, ctx = c.getContext('2d'), reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -37,7 +37,7 @@ export default function StackMap({ nodes, avatar, hint, label }) {
     const pos = (e) => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
     const show = (p) => setTip(p ? { n: p, x: Math.min(Math.max(p.x, 90), W - 90), y: p.y } : null);
     const move = (e) => { const [x, y] = pos(e); mouse = e.pointerType === 'mouse' ? { x, y } : { x: -999, y: -999 }; if (drag) { const n = by[drag]; n.x = x; n.y = y; n.vx = n.vy = 0; } const p = pick(x, y); hover = p ? p.id : null; c.style.cursor = p ? 'grab' : 'default'; show(p); };
-    const down = (e) => { const [x, y] = pos(e), p = pick(x, y); if (p && e.pointerType !== 'touch') { drag = p.id; c.setPointerCapture(e.pointerId); } else if (p) { hover = p.id; show(p); } };
+    const down = (e) => { const [x, y] = pos(e), p = pick(x, y); if (p && e.pointerType !== 'touch') { drag = p.id; c.setPointerCapture(e.pointerId); } else if (e.pointerType === 'touch') { if (p && hover === p.id) { try { navigator.vibrate?.(10); } catch {} document.getElementById('ecosystem')?.scrollIntoView({ behavior: 'smooth' }); } else if (p) { hover = p.id; show(p); try { navigator.vibrate?.(6); } catch {} } else { hover = null; setTip(null); } } };
     const up = () => { drag = null; };
     const dbl = (e) => { const [x, y] = pos(e); if (pick(x, y)) document.getElementById('ecosystem')?.scrollIntoView({ behavior: 'smooth' }); };
     const leave = () => { mouse = { x: -999, y: -999 }; if (!drag) { hover = null; setTip(null); } };
@@ -45,5 +45,5 @@ export default function StackMap({ nodes, avatar, hint, label }) {
     const ro = new ResizeObserver(size); ro.observe(c); const io = new IntersectionObserver(([e]) => { vis = e.isIntersecting; }); io.observe(c); size(); colors(); step();
     return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); c.removeEventListener('pointermove', move); c.removeEventListener('pointerdown', down); c.removeEventListener('pointerup', up); c.removeEventListener('pointerleave', leave); c.removeEventListener('dblclick', dbl); };
   }, [nodes, avatar]);
-  return <div className="mapwrap"><canvas ref={cv} className="mapcv" role="img" aria-label={label} />{tip && <div className="mtip" style={{ left: tip.x, top: tip.y }}><b>{tip.n.t}</b><small>{tip.n.g}</small>{tip.n.d && <span>{tip.n.d}</span>}</div>}<p className="mhint">{hint}</p></div>;
+  return <div className="mapwrap"><canvas ref={cv} className="mapcv" role="img" aria-label={label} />{tip && <div className="mtip" style={{ left: tip.x, top: tip.y }}><b>{tip.n.t}</b><small>{tip.n.g}</small>{tip.n.d && <span>{tip.n.d}</span>}</div>}<p className="mhint"><span className="h-d">{hint}</span><span className="h-m">{hintTouch}</span></p></div>;
 }

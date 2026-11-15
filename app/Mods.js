@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
+import useSwipe from './useSwipe';
 export function Steps({ items }) {
-  const [a, setA] = useState(0); const it = items[a]; if (!it) return null;
-  return <div className="stp"><div className="bar"><i style={{ width: ((a + 1) / items.length) * 100 + '%' }} /></div>
+  const [a, setA] = useState(0), sw = useSwipe((d) => setA((x) => Math.min(items.length - 1, Math.max(0, x + d)))); const it = items[a]; if (!it) return null;
+  return <div className="stp" {...sw}><div className="bar"><i style={{ width: ((a + 1) / items.length) * 100 + '%' }} /></div>
     <div className="stp-g"><ol>{items.map((x, k) => <li key={k}><button aria-pressed={k === a} onClick={() => setA(k)}><b>{k + 1}</b>{x.t}</button></li>)}</ol>
       <div className="panel" key={a} aria-live="polite"><span className="num">{String(a + 1).padStart(2, '0')}</span><h3>{it.t}</h3><p>{it.x}</p></div></div></div>;
 }

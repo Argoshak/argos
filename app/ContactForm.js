@@ -7,7 +7,7 @@ export default function ContactForm({ lang }) {
   const t = X[lang] || X.en, [st, setSt] = useState(''), [busy, setBusy] = useState(false);
   const go = async (e) => { e.preventDefault(); const f = e.target; setBusy(true); setSt('');
     const r = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(f))) }).then((x) => x.json()).catch(() => ({}));
-    setBusy(false); setSt(r.ok ? 'ok' : 'er'); if (r.ok) f.reset(); };
+    setBusy(false); setSt(r.ok ? 'ok' : 'er'); if (r.ok) { f.reset(); try { navigator.vibrate?.([12, 50, 12]); } catch {} } };
   return <form className="cf rv" onSubmit={go}>
     <div className="fld"><input id="cf-n" name="name" placeholder=" " required maxLength={100} autoComplete="name" /><label htmlFor="cf-n">{t.n}</label><i /></div>
     <div className="fld"><input id="cf-e" name="email" type="email" placeholder=" " required maxLength={200} autoComplete="email" /><label htmlFor="cf-e">{t.e}</label><i /></div>

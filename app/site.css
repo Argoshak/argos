@@ -193,3 +193,27 @@ html[dir=rtl] .chips li[data-tip]::after{transform:translate(50%,6px)}.chips li[
 /* identity pattern on dark sections + back-to-top bob */
 section.dk::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,#ffc80010 0 1px,transparent 1px 26px);pointer-events:none}section.dk>.wrap{position:relative}
 #up:hover{animation:bob .5s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-5px)}}
+/* v13: mobile-first interactions (dock, swipe carousel, bottom sheet, ripples) + bento + view transition */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}::view-transition-old(root){z-index:1}::view-transition-new(root){z-index:2}
+.site button,.site a,.site summary,.dock{touch-action:manipulation}
+.rip-host{position:relative;overflow:hidden}.rip{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ffc80070;transform:scale(0);animation:rip .65s ease-out forwards;pointer-events:none}.btn.p .rip{background:#ffffffb0}@keyframes rip{to{transform:scale(20);opacity:0}}
+.dock{display:none}.dots{display:none}.grab{display:none}.sw-hint{display:none}.h-m{display:none}
+.hero .hl{transform:translateY(calc(var(--sy,0px) * -.1))}.hero .mapwrap{transform:translateY(calc(var(--sy,0px) * .07))}
+.shot img{transition:transform .35s ease-out}.pj:hover .shot img{transform:scale(1.08) translate(calc(var(--px,0) * -12px),calc(var(--py,0) * -8px))}
+@media(min-width:1000px){.grid.pg{grid-template-columns:repeat(3,1fr)}.grid.pg>.card:first-child{grid-column:span 2;grid-row:span 2}.grid.pg>.card:first-child h3{font-size:26px}.grid.pg>.card:first-child p{font-size:18px}}
+@media(hover:none){.h-d{display:none}.h-m{display:inline}.sw-hint{display:block;text-align:center;font:500 18px var(--mono);color:var(--gold);margin:10px 0 0;animation:nudge 1.6s ease-in-out infinite}@keyframes nudge{50%{transform:translateX(8px);opacity:.5}}}
+@media(max-width:860px){
+ .site{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+ .site .dock{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:max(10px,env(safe-area-inset-bottom));inset-inline:12px;z-index:60;background:color-mix(in srgb,#0B1953 94%,transparent);border:1px solid #ffffff26;border-radius:24px;padding:6px;backdrop-filter:blur(14px);box-shadow:0 14px 40px #000a}
+ .dock a,.dock button{display:grid;justify-items:center;align-content:center;gap:3px;background:none;border:0;color:#cdd8ff!important;font:500 10px var(--mono);padding:8px 2px;border-radius:18px;text-decoration:none;min-height:54px;transition:background .25s,color .25s,transform .15s}
+ .dock svg{width:22px;height:22px}.dock a:active,.dock button:active{transform:scale(.92)}.dock .on{color:var(--gold)!important;background:#ffc80020}
+ #up{bottom:calc(96px + env(safe-area-inset-bottom));inset-inline-end:16px}
+ .grid.pg{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:4px 22px 16px;margin-inline:-22px;scroll-padding-inline:22px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.grid.pg::-webkit-scrollbar{display:none}
+ .grid.pg>.card{flex:0 0 84%;scroll-snap-align:center}
+ .dots{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}.dots button{width:9px;height:9px;padding:0;border-radius:99px;border:0;background:var(--line);transition:width .3s,background .3s;min-height:0}.dots button.on{width:26px;background:var(--gold)}.dots .cnt{font:500 12px var(--mono);color:var(--mut);margin-inline-start:12px}
+ .modal.sheet{align-items:end;padding:0}.modal.sheet .mbox{border-radius:28px 28px 0 0;max-height:90vh;width:100%;max-width:none;animation:sheetUp .38s cubic-bezier(.2,.8,.2,1);padding-bottom:calc(24px + env(safe-area-inset-bottom));border-top-width:0}
+ .grab{display:block;width:46px;height:5px;border-radius:9px;background:#ffffff55;margin:-6px auto 16px;position:relative;touch-action:none;cursor:grab}.grab::before{content:"";position:absolute;inset:-18px -60px}
+ @keyframes sheetUp{from{transform:translateY(100%)}}
+}
+
+.dock a::after{display:none!important}.site .dock a{margin:0;white-space:normal}
