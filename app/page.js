@@ -7,6 +7,7 @@ import Projects from './Projects';
 import Quick from './Quick';
 import StackMap from './StackMap';
 import Flow from './Flow';
+import LabLoader from './LabLoader';
 import { Steps, Explorer, Layers } from './Mods';
 import './site.css';
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,7 @@ export default async function Home({ searchParams }) {
   };
   const modBody = (m) => { const it = (m.items || []).map((i) => ({ t: tx(i.title, lang), x: tx(i.text, lang), tag: lv(i.tag), meta: lv(i.meta), url: i.url || '' }));
     if (m.type === 'flow') return <Flow items={it} />;
+    if (m.type === 'lab') return <LabLoader lang={lang} />;
     if (m.type === 'layers') return <Layers items={it} />;
     if (m.type === 'bars') { const src = m.auto === 'ecosystem' ? Object.entries(eco.reduce((a, i) => { const g = lv(i.tag); a[g] = (a[g] || 0) + 1; return a; }, {})).map(([t, v]) => ({ t, v })) : it.map((i) => ({ t: i.t, v: parseFloat(i.meta) || 0 })); const mx = Math.max(1, ...src.map((b) => b.v));
       return <div className="bars">{src.map((b) => <div className="bar rv" key={b.t}><span>{b.t}</span><div><i style={{ '--w': (b.v / mx) * 100 + '%' }} /></div><b>{b.v}</b></div>)}</div>; }

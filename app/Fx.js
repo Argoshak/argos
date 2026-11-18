@@ -26,7 +26,7 @@ export default function Fx() {
     const reset = (el) => { if (el) { el.style.transform = ''; el.style.transition = ''; } };
     const pm = (e) => { if (e.pointerType !== 'mouse') return; px = e.clientX; py = e.clientY; const t = e.target; if (!t.closest) return;
       const cd = t.closest('.card'); if (cd) { const r = cd.getBoundingClientRect(); cd.style.setProperty('--mx', e.clientX - r.left + 'px'); cd.style.setProperty('--my', e.clientY - r.top + 'px');
-        if (fine && !reduce && !cd.classList.contains('cc')) { if (tilted && tilted !== cd) reset(tilted); tilted = cd; const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; cd.style.transition = 'transform .12s ease-out'; cd.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`; } }
+        if (fine && !reduce && !cd.classList.contains('cc') && cd.offsetWidth < 520) { if (tilted && tilted !== cd) reset(tilted); tilted = cd; const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; cd.style.transition = 'transform .12s ease-out'; cd.style.transform = `perspective(900px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`; } }
       else if (tilted) { reset(tilted); tilted = null; }
       const sh = t.closest('.shot'); if (sh) { const r = sh.getBoundingClientRect(); sh.style.setProperty('--px', ((e.clientX - r.left) / r.width - 0.5) * 2); sh.style.setProperty('--py', ((e.clientY - r.top) / r.height - 0.5) * 2); }
       const hr = t.closest('.hero'); if (hr) { const r = hr.getBoundingClientRect(); hr.style.setProperty('--hx', e.clientX - r.left + 'px'); hr.style.setProperty('--hy', e.clientY - r.top + 'px'); }
